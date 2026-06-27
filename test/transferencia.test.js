@@ -2,6 +2,7 @@ const request = require('supertest');
 const {expect} = require('chai');
 require('dotenv').config()
 const {obterToken} = require('../helpers/autenticacao.js')
+const postTransferencias = require('../fixtures/postTransferencias.json')
 
 describe('Transferencias', () =>{
     describe('POST /transferencias', () =>{
@@ -13,34 +14,27 @@ describe('Transferencias', () =>{
 
 
         it('Deve retornar sucesso com 201 quando o valor for igual ou acima de R$ 10,00', async() =>{
-            
+            const bodyTranferencias = {...postTransferencias}
+
             const resposta = await request(process.env.BASE_URL)
                 .post('/transferencias')
                 .set('Content-type', 'application/json')
                 .set('Authorization',`Bearer ${token}`)
-                .send({
-                    contaOrigem: 1,
-                    contaDestino: 2,
-                    valor: 11,
-                    token: ""
-                })
+                .send(bodyTranferencias)
 
                 expect(resposta.status).to.equal(201);
                 console.log(resposta.body)
         })
 
         it('Deve retornar falha com 422 quando o valor for abaixo de R$ 10,00', async() =>{
+            const bodyTranferencias = {...postTransferencias}
+            bodyTranferencias.valor = 7
 
             const resposta = await request(process.env.BASE_URL)
                 .post('/transferencias')
                 .set('Content-type', 'application/json')
                 .set('Authorization',`Bearer ${token}`)
-                .send({
-                    contaOrigem: 1,
-                    contaDestino: 2,
-                    valor: 7,
-                    token: ""
-                })
+                .send(bodyTranferencias)
 
                 expect(resposta.status).to.equal(422);
                 console.log(resposta.body)
